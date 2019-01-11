@@ -2,7 +2,8 @@
 This module can control some Acer beamers which have an RS232 port included.
 
 # Define
-`define <Name> ACER_BEAMER_RS232 <Device>`
+`define <Name> ACER_BEAMER_RS232 <Device>`  
+ser2net is also supported.
 
 Example:  
 `define Beamer ACER_BEAMER_RS232 /dev/ttyUSB0`
