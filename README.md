@@ -49,9 +49,6 @@ Example:
 # Pinout
 ![Pinout](http://bilder.hifi-forum.de/medium/226620/pinbelegung_195544.jpg)  
 Source: hifi-forum.de / Acer Support
-
-# To be implemented
- * Regular Power on/off check
  
 # Information sources
 Visit [http://www.hifi-forum.de/viewthread-94-10979.html](http://www.hifi-forum.de/viewthread-94-10979.html) if you need more information about the used protocol.  
