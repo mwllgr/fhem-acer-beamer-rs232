@@ -1,16 +1,15 @@
 ##############################################
 # $Id
 #
-# created originally by Markus Bloch, edited by Zadolux for Acer beamers
-#
+# Created originally by Markus Bloch, edited by Zadolux for Acer beamers.
 # This modules controls Acer beamers which are connected via RS232.
 #
 # Detailed Information about the hardware setup and more possible control commands:
 # http://www.hifi-forum.de/viewthread-94-10979.html
 #
 # Define:  define Beamer ACER_BEAMER_RS232 /dev/ttyUSB0
-#
 # Set: source:hmdi,dsub, ...
+# Get: manufacturer,model, ...
 #
 
 package main;
@@ -64,8 +63,6 @@ my %ACER_BEAMER_RS232_set = (
            }
 );
 
-
-
 #####################################
 sub
 ACER_BEAMER_RS232_Initialize($)
@@ -88,12 +85,8 @@ ACER_BEAMER_RS232_Define($$)
   my ($hash, $def) = @_;
   my @a = split("[ \t][ \t]*", $def);
 
-
-
   my $name = $a[0];
   my $dev = $a[2];
-
-
 
   $hash->{helper}{RECEIVE_BUFFER} = "";
   $dev .= "\@9600" if(not $dev =~ m/\@\d+/);
