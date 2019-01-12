@@ -2,7 +2,11 @@
 This module can control some Acer beamers which have an RS232 port included.  
 Just connect a USB-to-RS232 serial converter to your FHEM server. More information about the pinout below.
 
-# Define
+# Usage
+Just copy the file `FHEM/70_AcerBeamer_RS232.pm` into the `FHEM/` folder of your FHEM installation.  
+Example path: `/opt/fhem/FHEM/70_AcerBeamer_RS232.pm`
+
+## Define
 `define <Name> AcerBeamer_RS232 <Device>`  
 ser2net is also supported.
 
