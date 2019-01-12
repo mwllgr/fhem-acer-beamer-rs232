@@ -21,7 +21,7 @@ use DevIo;
 
 my %AcerBeamer_RS232_get = (
   "manufacturer" => "* 0 IR 037",
-  "model" => "* 0 IR 035",
+  # "model" => "* 0 IR 035", # works but no \r at the end
   "source" => "* 0 Src ?",
   "lampHours" => "* 0 Lamp",
 );
@@ -179,34 +179,41 @@ sub AcerBeamer_RS232_Read($)
       Log3 $name, 5, "$name: Command accepted";
       $hash->{cmdAccepted} = "yes";
 
-      if($hash->{lastGet} ne "")
+      Log3 $name, 5, "$name: Current buffer: " . $hash->{buffer};
+
+      if(defined($hash->{lastGet}))
       {
         $finalValue = substr($hash->{buffer}, 5);
+        Log3 $name, 5, "$name: SUBSTRinged buffer: " . $finalValue;
 
-            if($hash->{lastGet} eq "manufacturer")
+            if(index($finalValue, "\r") > 0)
             {
-              $finalValue =~ s/Name //;
-            }
-            elsif($hash->{lastGet} eq "source")
-            {
-              $finalValue =~ s/Src //;
-            }
-            elsif($hash->{lastGet} eq "lampHours" && $finalValue ne "")
-            {
-              $finalValue = sprintf("%d", $finalValue);
-            }
+              if($hash->{lastGet} eq "manufacturer")
+              {
+                $finalValue =~ s/Name //;
+              }
+              elsif($hash->{lastGet} eq "source")
+              {
+                $finalValue =~ s/Src //;
+              }
+              elsif($hash->{lastGet} eq "lampHours" && $finalValue ne "")
+              {
+                $finalValue = sprintf("%d", $finalValue);
+              }
 
-            readingsBeginUpdate($hash);
-            readingsBulkUpdate($hash, $hash->{lastGet}, $finalValue);
-            readingsEndUpdate($hash, 1);
+              readingsBeginUpdate($hash);
+              readingsBulkUpdate($hash, $hash->{lastGet}, $finalValue);
+              readingsEndUpdate($hash, 1);
+
+              delete($hash->{buffer});
+              delete($hash->{lastGet});
+          }
       }
     }
     else
     {
       $hash->{cmdAccepted} = "no";
     }
-
-    Log3 $name, 5, "$name: read buffer content: " . $hash->{buffer};
 }
 
 #####################################
