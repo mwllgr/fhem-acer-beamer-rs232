@@ -20,47 +20,50 @@ use Time::HiRes qw(gettimeofday);
 use DevIo;
 
 my %AcerBeamer_RS232_get = (
+  "power" => "* 0 IR 037", # Requests manufacturer (but doesn't set it), just for power check
   "manufacturer" => "* 0 IR 037",
-  # "model" => "* 0 IR 035", # works but no \r at the end
   "source" => "* 0 Src ?",
   "lampHours" => "* 0 Lamp",
+  # "model" => "* 0 IR 035", # works but no \r at the end
 );
 
 my %AcerBeamer_RS232_set = (
-"remoteControl" => {
-            "volUp" => "* 0 IR 023",
-            "volDown"    => "* 0 IR 024",
-            "mute"    => "* 0 IR 006",
-            "menu" => "* 0 IR 008",
-            "freeze"     => "* 0 IR 007",
-            "hide"     => "* 0 IR 030",
-            "up"     => "* 0 IR 009",
-            "down"     => "* 0 IR 010",
-            "left"     => "* 0 IR 011",
-            "right"     => "* 0 IR 012",
-            "zoom"     => "* 0 IR 046",
-           },
-"quickSettings" => {
-            "brightness" => "* 0 IR 025",
-            "contrast"    => "* 0 IR 026",
-            "colorTemp"    => "* 0 IR 027",
-            "keystone" => "* 0 IR 004",
-            "colorRgb"     => "* 0 IR 048",
-            "ekey"     => "* 0 IR 047",
-            "language"     => "* 0 IR 049",
-           },
-"source" => {
-            "auto" => "* 0 IR 031",
-            "resync"    => "* 0 IR 014",
-            "dsub"    => "* 0 IR 015",
-            "hdmi" => "* 0 IR 050",
-            "composite"     => "* 0 IR 019",
-            "svideo"     => "* 0 IR 018",
-           },
-"power" => {
-            "on"        => "* 0 IR 001",
-            "off"       => "* 0 IR 002",
-           }
+  "remoteControl" => {
+    "volUp"           => "* 0 IR 023",
+    "volDown"         => "* 0 IR 024",
+    "mute"            => "* 0 IR 006",
+    "menu"            => "* 0 IR 008",
+    "freeze"          => "* 0 IR 007",
+    "hide"            => "* 0 IR 030",
+    "up"              => "* 0 IR 009",
+    "down"            => "* 0 IR 010",
+    "left"            => "* 0 IR 011",
+    "right"           => "* 0 IR 012",
+    "zoom"            => "* 0 IR 046"
+  },
+  "quickSettings" => {
+    "16:9"            => "* 0 IR 021",
+    "4:3"             => "* 0 IR 022",
+    "brightness"      => "* 0 IR 025",
+    "contrast"        => "* 0 IR 026",
+    "colorTemp"       => "* 0 IR 027",
+    "keystone"        => "* 0 IR 004",
+    "colorRgb"        => "* 0 IR 048",
+    "ekey"            => "* 0 IR 047",
+    "language"        => "* 0 IR 049",
+  },
+  "source" => {
+    "auto"            => "* 0 IR 031",
+    "resync"          => "* 0 IR 014",
+    "dsub"            => "* 0 IR 015",
+    "hdmi"            => "* 0 IR 050",
+    "composite"       => "* 0 IR 019",
+    "svideo"          => "* 0 IR 018",
+  },
+  "power" => {
+    "on"              => "* 0 IR 001",
+    "off"             => "* 0 IR 002",
+  }
 );
 
 #####################################
@@ -88,14 +91,14 @@ AcerBeamer_RS232_Define($$)
   my $name = $a[0];
   my $dev = $a[2];
 
-  $hash->{helper}{RECEIVE_BUFFER} = "";
+  #$hash->{helper}{RECEIVE_BUFFER} = "";
   $dev .= "\@9600" if(not $dev =~ m/\@\d+/);
   $hash->{DeviceName} = $dev;
   DevIo_CloseDev($hash);
 
   my $ret = DevIo_OpenDev($hash, 0, undef);
-  delete($hash->{PARTIAL});
-  RemoveInternalTimer($hash);
+  #delete($hash->{PARTIAL});
+  #RemoveInternalTimer($hash);
   return undef;
 }
 
@@ -121,6 +124,7 @@ AcerBeamer_RS232_Set($@)
       $hash->{buffer} = "";
       $hash->{lastGet} = "";
 
+      InternalTimer(gettimeofday()+2, "AcerBeamer_RS232_TimeOut", $hash, 0);
       DevIo_SimpleWrite($hash, $AcerBeamer_RS232_set{$what}{$a[2]}."\r", 0);
     }
     else
@@ -155,12 +159,26 @@ AcerBeamer_RS232_Get($@)
     else
     {
       $serialCmd = $AcerBeamer_RS232_get{$attr};
+
+      if($attr eq "power")
+      {
+        InternalTimer(gettimeofday()+2, "AcerBeamer_RS232_TimeOut", $hash, 0);
+      }
+
       DevIo_SimpleWrite($hash, $serialCmd . "\r", 0);
     }
 
     $hash->{lastGet} = $getName;
     $hash->{buffer} = "";
-    return "Read with command \"" . $serialCmd . "\" started, watch readings.";
+
+    if($attr eq "power")
+    {
+      return "Sent power check, watch readings.";
+    }
+    else
+    {
+      return "Read with command \"" . $serialCmd . "\" started, watch readings.";
+    }
 }
 
 sub AcerBeamer_RS232_Read($)
@@ -179,9 +197,18 @@ sub AcerBeamer_RS232_Read($)
       Log3 $name, 5, "$name: Command accepted";
       $hash->{cmdAccepted} = "yes";
 
+      if($hash->{lastGet} eq "power")
+      {
+        readingsBeginUpdate($hash);
+        readingsBulkUpdate($hash, "presence", "present");
+        readingsBulkUpdate($hash, "state", "on");
+        readingsEndUpdate($hash, 1);
+        RemoveInternalTimer($hash);
+      }
+
       Log3 $name, 5, "$name: Current buffer: " . $hash->{buffer};
 
-      if(defined($hash->{lastGet}))
+      if(defined($hash->{lastGet}) && $hash->{lastGet} ne "power")
       {
         $finalValue = substr($hash->{buffer}, 5);
         Log3 $name, 5, "$name: SUBSTRinged buffer: " . $finalValue;
@@ -223,6 +250,23 @@ AcerBeamer_RS232_Ready($)
   my ($hash) = @_;
 
   return DevIo_OpenDev($hash, 1, undef) if($hash->{STATE} eq "disconnected");
+}
+
+# Executed if beamer does not respond
+sub
+AcerBeamer_RS232_TimeOut($)
+{
+  my ($hash) = @_;
+
+  readingsBeginUpdate($hash);
+  readingsBulkUpdate($hash, "presence", "absent");
+  readingsBulkUpdate($hash, "state", "off");
+  readingsEndUpdate($hash, 1);
+
+  delete($hash->{buffer});
+  delete($hash->{lastGet});
+
+  RemoveInternalTimer($hash);
 }
 
 1;
