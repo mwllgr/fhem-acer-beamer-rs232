@@ -51,7 +51,7 @@ Example:
 Source: hifi-forum.de / Acer Support
 
 # To be implemented
- * Power on/off check
+ * Regular Power on/off check
  
 # Information sources
 Visit [http://www.hifi-forum.de/viewthread-94-10979.html](http://www.hifi-forum.de/viewthread-94-10979.html) if you need more information about the used protocol.  
