@@ -245,6 +245,19 @@ sub AcerBeamer_RS232_Read($)
                 elsif($hash->{lastGet} eq "source")
                 {
                   $finalValue =~ s/Src //;
+
+                  if($finalValue == 0)
+                  {
+                      $finalValue = "noSignal";
+                  }
+                  elsif($finalValue == 1)
+                  {
+                      $finalValue = "dsub";
+                  }
+                  elsif($finalValue == 8)
+                  {
+                    $finalValue = "hdmi";
+                  }
                 }
                 elsif($hash->{lastGet} eq "lampHours" && $finalValue ne "")
                 {
