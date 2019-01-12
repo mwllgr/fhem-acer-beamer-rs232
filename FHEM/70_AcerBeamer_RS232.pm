@@ -90,15 +90,26 @@ AcerBeamer_RS232_Define($$)
 
   my $name = $a[0];
   my $dev = $a[2];
+  my $interval  = 60;
 
-  #$hash->{helper}{RECEIVE_BUFFER} = "";
+  if(int(@a) == 4) {
+    $interval= $a[3];
+    if ($interval < 20) {
+      return "interval too small, please use something >= 20, default is 60";
+    }
+  }
+
   $dev .= "\@9600" if(not $dev =~ m/\@\d+/);
   $hash->{DeviceName} = $dev;
+  $hash->{INTERVAL} = $interval;
   DevIo_CloseDev($hash);
 
   my $ret = DevIo_OpenDev($hash, 0, undef);
-  #delete($hash->{PARTIAL});
-  #RemoveInternalTimer($hash);
+  delete($hash->{PARTIAL});
+
+  RemoveInternalTimer($hash);
+  AcerBeamer_RS232_GetStatus($hash);
+
   return undef;
 }
 
@@ -140,6 +151,7 @@ AcerBeamer_RS232_Set($@)
     }
 }
 
+#####################################
 sub
 AcerBeamer_RS232_Get($@)
 {
@@ -181,6 +193,8 @@ AcerBeamer_RS232_Get($@)
     }
 }
 
+######################################
+# Executed whenever the serial port receives something
 sub AcerBeamer_RS232_Read($)
 {
     my ($hash) = @_;
@@ -195,7 +209,7 @@ sub AcerBeamer_RS232_Read($)
     if(index($hash->{buffer}, "*000") != -1)
     {
       Log3 $name, 5, "$name: Command accepted";
-      $hash->{cmdAccepted} = "yes";
+      $hash->{cmdAccepted} = 1;
 
       if($hash->{lastGet} eq "power")
       {
@@ -203,43 +217,51 @@ sub AcerBeamer_RS232_Read($)
         readingsBulkUpdate($hash, "presence", "present");
         readingsBulkUpdate($hash, "state", "on");
         readingsEndUpdate($hash, 1);
+
+        delete($hash->{buffer});
+        delete($hash->{lastGet});
+
         RemoveInternalTimer($hash);
+        InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AcerBeamer_RS232_GetStatus", $hash, 0);
       }
-
-      Log3 $name, 5, "$name: Current buffer: " . $hash->{buffer};
-
-      if(defined($hash->{lastGet}) && $hash->{lastGet} ne "power")
+      else
       {
-        $finalValue = substr($hash->{buffer}, 5);
-        Log3 $name, 5, "$name: SUBSTRinged buffer: " . $finalValue;
+        Log3 $name, 5, "$name: Current buffer: " . $hash->{buffer};
 
-            if(index($finalValue, "\r") > 0)
-            {
-              if($hash->{lastGet} eq "manufacturer")
-              {
-                $finalValue =~ s/Name //;
-              }
-              elsif($hash->{lastGet} eq "source")
-              {
-                $finalValue =~ s/Src //;
-              }
-              elsif($hash->{lastGet} eq "lampHours" && $finalValue ne "")
-              {
-                $finalValue = sprintf("%d", $finalValue);
-              }
+        if(defined($hash->{lastGet}) && $hash->{lastGet} ne "power")
+        {
+          $finalValue = substr($hash->{buffer}, 5);
 
-              readingsBeginUpdate($hash);
-              readingsBulkUpdate($hash, $hash->{lastGet}, $finalValue);
-              readingsEndUpdate($hash, 1);
+          Log3 $name, 5, "$name: SUBSTRinged buffer: " . $finalValue;
 
-              delete($hash->{buffer});
-              delete($hash->{lastGet});
-          }
+              if(index($finalValue, "\r") > 0)
+              {
+                if($hash->{lastGet} eq "manufacturer")
+                {
+                  $finalValue =~ s/Name //;
+                }
+                elsif($hash->{lastGet} eq "source")
+                {
+                  $finalValue =~ s/Src //;
+                }
+                elsif($hash->{lastGet} eq "lampHours" && $finalValue ne "")
+                {
+                  $finalValue = sprintf("%d", $finalValue);
+                }
+
+                readingsBeginUpdate($hash);
+                readingsBulkUpdate($hash, $hash->{lastGet}, $finalValue);
+                readingsEndUpdate($hash, 1);
+
+                delete($hash->{buffer});
+                delete($hash->{lastGet});
+            }
+        }
       }
     }
     else
     {
-      $hash->{cmdAccepted} = "no";
+      $hash->{cmdAccepted} = 0;
     }
 }
 
@@ -252,6 +274,21 @@ AcerBeamer_RS232_Ready($)
   return DevIo_OpenDev($hash, 1, undef) if($hash->{STATE} eq "disconnected");
 }
 
+#####################################
+# Executed regularly to check the power status
+sub
+AcerBeamer_RS232_GetStatus($)
+{
+  my ($hash) = @_;
+
+  $hash->{lastGet} = "power";
+  RemoveInternalTimer($hash);
+
+  DevIo_SimpleWrite($hash, "* 0 IR 037" . "\r", 0);
+  InternalTimer(gettimeofday()+2, "AcerBeamer_RS232_TimeOut", $hash, 0);
+}
+
+#####################################
 # Executed if beamer does not respond
 sub
 AcerBeamer_RS232_TimeOut($)
@@ -267,6 +304,7 @@ AcerBeamer_RS232_TimeOut($)
   delete($hash->{lastGet});
 
   RemoveInternalTimer($hash);
+  InternalTimer(gettimeofday()+$hash->{INTERVAL}, "AcerBeamer_RS232_GetStatus", $hash, 0);
 }
 
 1;
