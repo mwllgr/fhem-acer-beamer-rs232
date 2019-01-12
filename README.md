@@ -46,7 +46,6 @@ Example:
 Source: hifi-forum.de / Acer Support
 
 # To be implemented
- * Check for complete response
  * Power on/off check
  
 # Information sources
