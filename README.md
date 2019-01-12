@@ -39,7 +39,14 @@ Example:
   * Keystone
   * eKey
   * Language
-  
-# Sources
+
+# To be implemented
+ * Requesting information from the beamer  
+   * `* 0 IR 037` - Gets the manufacturer - Example: `Name Acer`  
+   * `* 0 IR 035` - Gets the beamer model - Example: `P1166P`  
+   * `* 0 Src ?` - Gets the current source - Example: `Src 0`  
+   * `* 0 Lamp` - Gets the lamp hours - Example: `0386`
+ 
+# Information sources
 Visit [http://www.hifi-forum.de/viewthread-94-10979.html](http://www.hifi-forum.de/viewthread-94-10979.html) if you need more information about the used protocol.  
 Module based on [75_LGTV_RS232.pm by markusbloch](https://svn.fhem.de/trac/browser/trunk/fhem/contrib/75_LGTV_RS232.pm).
