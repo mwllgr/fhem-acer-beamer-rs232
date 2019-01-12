@@ -1,5 +1,6 @@
 # FHEM module to control Acer beamers via RS232
-This module can control some Acer beamers which have an RS232 port included.
+This module can control some Acer beamers which have an RS232 port included.  
+Just connect a USB-to-RS232 serial converter to your FHEM server. More information about the pinout below.
 
 # Define
 `define <Name> ACER_BEAMER_RS232 <Device>`  
@@ -39,6 +40,10 @@ Example:
   * Keystone
   * eKey
   * Language
+
+# Pinout
+![Pinout](http://bilder.hifi-forum.de/medium/226620/pinbelegung_195544.jpg)  
+Source: hifi-forum.de / Acer Support
 
 # To be implemented
  * Requesting information from the beamer  
