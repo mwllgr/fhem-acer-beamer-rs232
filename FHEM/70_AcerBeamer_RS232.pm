@@ -199,7 +199,7 @@ sub AcerBeamer_RS232_Read($)
 {
     my ($hash) = @_;
     my $name = $hash->{NAME};
-    my $finalValue;
+    my $finalValue = "";
 
     # read from serial device
     my $buf = DevIo_SimpleRead($hash);
@@ -230,9 +230,11 @@ sub AcerBeamer_RS232_Read($)
 
         if(defined($hash->{lastGet}) && $hash->{lastGet} ne "power")
         {
-          $finalValue = substr($hash->{buffer}, 5);
-
-          Log3 $name, 5, "$name: SUBSTRinged buffer: " . $finalValue;
+          if(length($hash->{buffer}) > 4)
+          {
+            $finalValue = substr($hash->{buffer}, 5);
+            Log3 $name, 5, "$name: SUBSTRinged buffer: " . $finalValue;
+          }
 
               if(index($finalValue, "\r") > 0)
               {
