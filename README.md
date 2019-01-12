@@ -37,6 +37,7 @@ Example:
   * Left
   * Right
 * Quick settings
+  * 16:9 / 4:3
   * Brightness
   * Contrast
   * Color temperature
