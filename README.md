@@ -3,11 +3,11 @@ This module can control some Acer beamers which have an RS232 port included.
 Just connect a USB-to-RS232 serial converter to your FHEM server. More information about the pinout below.
 
 # Define
-`define <Name> ACER_BEAMER_RS232 <Device>`  
+`define <Name> AcerBeamer_RS232 <Device>`  
 ser2net is also supported.
 
 Example:  
-`define Beamer ACER_BEAMER_RS232 /dev/ttyUSB0`
+`define Beamer AcerBeamer_RS232 /dev/ttyUSB0`
 
 # Available commands
 * Power
@@ -46,11 +46,8 @@ Example:
 Source: hifi-forum.de / Acer Support
 
 # To be implemented
- * Requesting information from the beamer  
-   * `* 0 IR 037` - Gets the manufacturer - Example: `Name Acer`  
-   * `* 0 IR 035` - Gets the beamer model - Example: `P1166P`  
-   * `* 0 Src ?` - Gets the current source - Example: `Src 0`  
-   * `* 0 Lamp` - Gets the lamp hours - Example: `0386`
+ * Check for complete response
+ * Power on/off check
  
 # Information sources
 Visit [http://www.hifi-forum.de/viewthread-94-10979.html](http://www.hifi-forum.de/viewthread-94-10979.html) if you need more information about the used protocol.  
