@@ -7,7 +7,7 @@
 # Detailed Information about the hardware setup and more possible control commands:
 # http://www.hifi-forum.de/viewthread-94-10979.html
 #
-# Define:  define Beamer ACER_BEAMER_RS232 /dev/ttyUSB0
+# Define:  define Beamer AcerBeamer_RS232 /dev/ttyUSB0
 # Set: source:hmdi,dsub, ...
 # Get: manufacturer,model, ...
 #
@@ -19,14 +19,14 @@ use warnings;
 use Time::HiRes qw(gettimeofday);
 use DevIo;
 
-my %ACER_BEAMER_RS232_get = (
+my %AcerBeamer_RS232_get = (
   "manufacturer" => "* 0 IR 037",
   "model" => "* 0 IR 035",
   "source" => "* 0 Src ?",
   "lampHours" => "* 0 Lamp",
 );
 
-my %ACER_BEAMER_RS232_set = (
+my %AcerBeamer_RS232_set = (
 "remoteControl" => {
             "volUp" => "* 0 IR 023",
             "volDown"    => "* 0 IR 024",
@@ -65,22 +65,22 @@ my %ACER_BEAMER_RS232_set = (
 
 #####################################
 sub
-ACER_BEAMER_RS232_Initialize($)
+AcerBeamer_RS232_Initialize($)
 {
   my ($hash) = @_;
 
-  $hash->{DefFn}    = "ACER_BEAMER_RS232_Define";
-  $hash->{UndefFn}  = "ACER_BEAMER_RS232_Undef";
-  $hash->{ReadFn} = "ACER_BEAMER_RS232_Read";
-  $hash->{SetFn}    = "ACER_BEAMER_RS232_Set";
-  $hash->{GetFn}    = "ACER_BEAMER_RS232_Get";
-  $hash->{ReadyFn}  = "ACER_BEAMER_RS232_Ready";
+  $hash->{DefFn}    = "AcerBeamer_RS232_Define";
+  $hash->{UndefFn}  = "AcerBeamer_RS232_Undef";
+  $hash->{ReadFn} = "AcerBeamer_RS232_Read";
+  $hash->{SetFn}    = "AcerBeamer_RS232_Set";
+  $hash->{GetFn}    = "AcerBeamer_RS232_Get";
+  $hash->{ReadyFn}  = "AcerBeamer_RS232_Ready";
   $hash->{AttrList} = " ".$readingFnAttributes;
 }
 
 #####################################
 sub
-ACER_BEAMER_RS232_Define($$)
+AcerBeamer_RS232_Define($$)
 {
   my ($hash, $def) = @_;
   my @a = split("[ \t][ \t]*", $def);
@@ -101,7 +101,7 @@ ACER_BEAMER_RS232_Define($$)
 
 #####################################
 sub
-ACER_BEAMER_RS232_Undef($$)
+AcerBeamer_RS232_Undef($$)
 {
   my ($hash, $arg) = @_;
 
@@ -111,25 +111,25 @@ ACER_BEAMER_RS232_Undef($$)
 
 #####################################
 sub
-ACER_BEAMER_RS232_Set($@)
+AcerBeamer_RS232_Set($@)
 {
     my ($hash, @a) = @_;
     my $what = $a[1];
 
-    if(exists($ACER_BEAMER_RS232_set{$what}) and exists($ACER_BEAMER_RS232_set{$what}{$a[2]}))
+    if(exists($AcerBeamer_RS232_set{$what}) and exists($AcerBeamer_RS232_set{$what}{$a[2]}))
     {
       $hash->{buffer} = "";
       $hash->{lastGet} = "";
 
-      DevIo_SimpleWrite($hash, $ACER_BEAMER_RS232_set{$what}{$a[2]}."\r", 0);
+      DevIo_SimpleWrite($hash, $AcerBeamer_RS232_set{$what}{$a[2]}."\r", 0);
     }
     else
     {
       my $usage = "unknown argument $what choose one of ";
 
-      foreach my $cmd (sort keys %ACER_BEAMER_RS232_set)
+      foreach my $cmd (sort keys %AcerBeamer_RS232_set)
       {
-         $usage .= " $cmd:".join(",", sort keys %{$ACER_BEAMER_RS232_set{$cmd}});
+         $usage .= " $cmd:".join(",", sort keys %{$AcerBeamer_RS232_set{$cmd}});
       }
 
       return $usage;
@@ -137,7 +137,7 @@ ACER_BEAMER_RS232_Set($@)
 }
 
 sub
-ACER_BEAMER_RS232_Get($@)
+AcerBeamer_RS232_Get($@)
 {
     my ($hash, @a) = @_;
     return "get needs at least an argument" if ( @a < 2 );
@@ -147,14 +147,14 @@ ACER_BEAMER_RS232_Get($@)
     my $attr = shift @a;
     my $serialCmd;
 
-    if(!$ACER_BEAMER_RS232_get{$attr})
+    if(!$AcerBeamer_RS232_get{$attr})
     {
-        my @cList = keys %ACER_BEAMER_RS232_get;
+        my @cList = keys %AcerBeamer_RS232_get;
         return "unknown argument $attr choose one of " . join(" ", @cList);
     }
     else
     {
-      $serialCmd = $ACER_BEAMER_RS232_get{$attr};
+      $serialCmd = $AcerBeamer_RS232_get{$attr};
       DevIo_SimpleWrite($hash, $serialCmd . "\r", 0);
     }
 
@@ -163,7 +163,7 @@ ACER_BEAMER_RS232_Get($@)
     return "Read with command \"" . $serialCmd . "\" started, watch readings.";
 }
 
-sub ACER_BEAMER_RS232_Read($)
+sub AcerBeamer_RS232_Read($)
 {
     my ($hash) = @_;
     my $name = $hash->{NAME};
@@ -211,7 +211,7 @@ sub ACER_BEAMER_RS232_Read($)
 
 #####################################
 sub
-ACER_BEAMER_RS232_Ready($)
+AcerBeamer_RS232_Ready($)
 {
   my ($hash) = @_;
 
