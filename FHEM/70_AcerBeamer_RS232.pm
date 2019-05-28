@@ -323,3 +323,42 @@ AcerBeamer_RS232_TimeOut($)
 }
 
 1;
+
+
+
+
+=pod
+=item device
+=item summary Module for controlling Acer beamers via RS232
+=begin html
+ <a name="AcerBeamer_RS232"></a>
+ <h3>AcerBeamer_RS232</h3>
+ This module interacts with Acer beamers.
+ <ul><br>
+  <a name="AcerBeamer_RS232_Define"></a>
+  <b>Define</b>
+  <ul> 
+   <code>define &lt;Name&gt; AcerBeamer_RS232 &lt;Device&gt;</code><br>
+   <br>
+   Example: <code>define Beamer AcerBeamer_RS232 /dev/ttyUSB0</code>
+ </ul><br>
+ <ul><br>
+  <a name="WKRCD4_Set"></a>
+  <b>Set</b>
+  <ul>
+   <li>All remote control feautures</li>
+  </ul>
+ </ul> 
+ <ul><br>
+  <a name="WKRCD4_Get"></a>
+  <b>Set</b>
+  <ul>
+   <li>lampHours</li>
+   <li>manufacturer</li>
+   <li>power</li>
+   <li>source</li>
+  </ul>
+ </ul> 
+ 
+=end html
+=cut
