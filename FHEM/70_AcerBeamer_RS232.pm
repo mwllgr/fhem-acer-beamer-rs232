@@ -330,7 +330,9 @@ AcerBeamer_RS232_TimeOut($)
 =pod
 =item device
 =item summary Module for controlling Acer beamers via RS232
+
 =begin html
+
  <a name="AcerBeamer_RS232"></a>
  <h3>AcerBeamer_RS232</h3>
  This module interacts with Acer beamers.
@@ -361,4 +363,5 @@ AcerBeamer_RS232_TimeOut($)
  </ul> 
  
 =end html
+
 =cut
