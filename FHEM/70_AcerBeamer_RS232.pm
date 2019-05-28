@@ -351,7 +351,7 @@ AcerBeamer_RS232_TimeOut($)
  </ul> 
  <ul><br>
   <a name="WKRCD4_Get"></a>
-  <b>Set</b>
+  <b>Get</b>
   <ul>
    <li>lampHours</li>
    <li>manufacturer</li>
