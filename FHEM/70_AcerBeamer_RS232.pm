@@ -1,7 +1,7 @@
 ##############################################
 # $Id
 #
-# Created originally by Markus Bloch, edited by Zadolux for Acer beamers.
+# Created originally by Markus Bloch, edited by mwllgr for Acer beamers.
 # This modules controls Acer beamers which are connected via RS232.
 #
 # Detailed Information about the hardware setup and more possible control commands:
