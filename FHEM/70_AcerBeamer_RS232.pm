@@ -1,7 +1,7 @@
 ##############################################
 # $Id
 #
-# Created originally by Markus Bloch, edited by mwllgr for Acer beamers.
+# Created originally by Markus Bloch, edited by Zadolux for Acer beamers.
 # This modules controls Acer beamers which are connected via RS232.
 #
 # Detailed Information about the hardware setup and more possible control commands:
@@ -140,14 +140,14 @@ AcerBeamer_RS232_Set($@)
     }
     else
     {
-      my $usage = "unknown argument $what choose one of ";
+      my $usage = "unknown argument $what choose one of";
 
       foreach my $cmd (sort keys %AcerBeamer_RS232_set)
       {
          $usage .= " $cmd:".join(",", sort keys %{$AcerBeamer_RS232_set{$cmd}});
       }
 
-      return $usage;
+      return trim($usage);
     }
 }
 
@@ -166,7 +166,7 @@ AcerBeamer_RS232_Get($@)
     if(!$AcerBeamer_RS232_get{$attr})
     {
         my @cList = keys %AcerBeamer_RS232_get;
-        return "unknown argument $attr choose one of " . join(" ", @cList);
+        return "unknown argument $attr choose one of " . join(":noArg ", @cList, '');
     }
     else
     {
